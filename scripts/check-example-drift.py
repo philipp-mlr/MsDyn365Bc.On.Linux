@@ -64,6 +64,9 @@ PAIRS = {
 # intentionally do less than the reusable workflow, not a place to silence
 # the check.
 EXEMPT = {
+    "scripts/compile-workspace.py":
+        "only used with the opt-in workspace_compile input; the examples "
+        "show the default per-dir compile",
     "scripts/run-tests-altool.py":
         "the altool runner is opt-in and BC 28+ only; the examples "
         "deliberately show the websocket runner, which works everywhere",
