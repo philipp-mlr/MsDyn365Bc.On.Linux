@@ -175,6 +175,8 @@ services:
       # Backup path inside the sql container to restore instead of the artifact's
       # database, e.g. one baked into BC_SQL_IMAGE.
       BC_DATABASE_BAK: ${BC_DATABASE_BAK:-}
+      # false: leave the Test Runner Extension out (builds a backup for BC_DATABASE_BAK)
+      BC_PUBLISH_TESTRUNNER: ${BC_PUBLISH_TESTRUNNER:-true}
       # Seconds each dev-endpoint publish at boot may take (default 600).
       BC_PUBLISH_TIMEOUT: ${BC_PUBLISH_TIMEOUT:-}
       # Opt-in: self-host Microsoft's real BC web client on Kestrel (port 8080).

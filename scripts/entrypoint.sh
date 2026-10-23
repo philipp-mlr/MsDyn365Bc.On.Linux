@@ -1586,6 +1586,15 @@ exec 3>/tmp/bc-stdin
     # BC_SKIP_APP_PUBLISH=true: skip all publishing (caller manages extensions)
     if [ "${BC_SKIP_APP_PUBLISH:-false}" = "true" ]; then
         echo "[entrypoint] Skipping app publishing (BC_SKIP_APP_PUBLISH=true)"
+        # A prebuilt database has no Test Runner Extension (see BC_PUBLISH_TESTRUNNER):
+        # publish it fresh, its install creates the tenant encryption key.
+        if [ -n "${BC_DATABASE_BAK:-}" ] && [ "${BC_PUBLISH_TESTRUNNER:-true}" != "false" ] && [ -f /bc/testrunner/TestRunner.app ]; then
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 \
+                -u "$BC_SERVER_USERNAME:$BC_SERVER_PASSWORD" -X POST \
+                -F "file=@/bc/testrunner/TestRunner.app;type=application/octet-stream" \
+                "$DEV_URL/apps?SchemaUpdateMode=synchronize" 2>&1)
+            echo "[entrypoint] Test Runner Extension (prebuilt database): HTTP $HTTP_CODE"
+        fi
     else
         # -------------------------------------------------------------------------
         # BC_CLEAR_ALL_APPS: republish all previously-installed extensions in
@@ -1921,8 +1930,10 @@ PYEOF
             done
         fi
 
-        # Publish our TestRunner Extension (custom API for test execution, depends on MS Test Runner)
-        if [ -f /bc/testrunner/TestRunner.app ]; then
+        # Publish our TestRunner Extension (custom API for test execution, depends on MS Test Runner).
+        # BC_PUBLISH_TESTRUNNER=false leaves it out, so a database backed up here has none;
+        # a consumer restoring it publishes it after the restore (see the skip branch above).
+        if [ -f /bc/testrunner/TestRunner.app ] && [ "${BC_PUBLISH_TESTRUNNER:-true}" != "false" ]; then
             echo "[entrypoint] Publishing Test Runner Extension..."
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
                 -u "$BC_SERVER_USERNAME:$BC_SERVER_PASSWORD" -X POST \
