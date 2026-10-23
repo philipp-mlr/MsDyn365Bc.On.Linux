@@ -63,6 +63,8 @@ jobs:
         run: bash scripts/test-install-al-compiler.sh
       - name: Jobs take a free BC stack from the slot pool
         run: bash scripts/test-ci-lock-slots.sh
+      - name: The test report reads every failure
+        run: python3 scripts/test-junit-report.py
 
       - name: Codeunit id batching is total
         run: python3 scripts/chunk-codeunit-ids.py --self-test
