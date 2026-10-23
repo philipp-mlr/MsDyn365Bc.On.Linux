@@ -59,6 +59,8 @@ jobs:
       # the only thing standing between that bug and a merge.
       - name: Workspace compile builds every wave before the next
         run: python3 scripts/test-compile-workspace.py
+      - name: Concurrent AL compiler installs do not corrupt each other
+        run: bash scripts/test-install-al-compiler.sh
 
       - name: Codeunit id batching is total
         run: python3 scripts/chunk-codeunit-ids.py --self-test
