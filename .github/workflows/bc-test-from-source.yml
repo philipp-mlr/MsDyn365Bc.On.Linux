@@ -238,6 +238,15 @@ on:
         required: false
         type: boolean
         default: false
+      publish_testrunner:
+        description: >-
+          Publish the Test Runner Extension at boot. Set false when the database
+          is to be backed up for database_bak: a backup without it makes the
+          restore install it fresh, which creates the tenant encryption key.
+          Default true (today's behaviour).
+        required: false
+        type: boolean
+        default: true
       extra_apps:
         description: >-
           Newline-separated names of Microsoft apps from the BC artifact to
@@ -645,6 +654,7 @@ jobs:
     continue-on-error: ${{ inputs.continue_on_error }}
     env:
       BC_RUNNER_IMAGE: ${{ inputs.runner_image || (inputs.rdlc_renderer && format('ghcr.io/{0}/bc-runner:rdlc', vars.IMAGE_NAMESPACE || 'aldevtools/msdyn365bc.on.linux')) || (vars.IMAGE_NAMESPACE && format('ghcr.io/{0}/bc-runner:latest', vars.IMAGE_NAMESPACE)) || '' }}
+      BC_PUBLISH_TESTRUNNER: ${{ inputs.publish_testrunner && 'true' || 'false' }}
       BC_RDLC_RENDERER: ${{ inputs.rdlc_renderer && 'mono' || '' }}
       BC_RDLC_TRUST_LAYOUTS: ${{ inputs.rdlc_renderer && inputs.rdlc_trust_layouts && '1' || '' }}
       # Blank passes through to docker-compose's `${BC_SQL_IMAGE:-<mirror>}`
